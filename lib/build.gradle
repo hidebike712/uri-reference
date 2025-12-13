@@ -38,6 +38,12 @@ test {
     }
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
 // Configure the Javadoc generation task with custom options.
 javadoc {
     options {
