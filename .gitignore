@@ -2,9 +2,6 @@
 .gradle/
 build/
 
-# Ignore Gradle wrapper jar file (.jar files are usually ignored, but adding for clarity)
-gradle-wrapper.jar
-
 # Compiled class files
 *.class
 
@@ -13,6 +10,8 @@ gradle-wrapper.jar
 
 # Jar, war, and other packaged files
 *.jar
+# Exception: Allow the Gradle wrapper jar file to be committed
+!gradle-wrapper.jar
 *.war
 *.nar
 *.ear
@@ -49,7 +48,6 @@ Thumbs.db
 
 # NetBeans
 nbproject/private/
-build/
 nbbuild/
 dist/
 nbdist/
