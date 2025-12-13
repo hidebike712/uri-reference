@@ -1,9 +1,5 @@
-# Gradle files
-.gradle/
-build/
-
-# Ignore Gradle wrapper jar file (.jar files are usually ignored, but adding for clarity)
-gradle-wrapper.jar
+# Target directory
+target/
 
 # Compiled class files
 *.class
