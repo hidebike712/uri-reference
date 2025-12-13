@@ -4,17 +4,16 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: write # Needed to push to gh-pages
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # needed for tagging
 
     - name: Set up Java and Maven Central credentials
       uses: actions/setup-java@v4
@@ -22,32 +21,30 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         server-id: central
-        server-username: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-        server-password: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
-        gpg-passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
     - name: Set release version
       run: mvn versions:set -DnewVersion=${{ github.event.release.tag_name }}
 
-    - name: Commit release version
+    - name: Deploy to Maven Central
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git commit -am "Release ${{ github.event.release.tag_name }}"
-        git push origin HEAD:main
-
-    - name: Build and test
-      run: mvn clean install -DskipTests=false
+        mvn -P release --batch-mode deploy -DskipTests
+      env:
+        MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
 
     - name: Generate Javadoc
       run: mvn javadoc:javadoc
 
-    - name: Deploy Javadoc to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Deploy JavaDoc
+      uses: MathieuSoysal/Javadoc-publisher.yml@v3.0.2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./target/reports/apidocs
-
-    - name: Deploy to Maven Central
-      run: mvn -P release --batch-mode deploy -DskipTests
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        javadoc-branch: gh-pages
+        java-version: 11
+        target-folder: '' # The URL will be https://<username>.github.io/<repo>/.
+        project: maven
