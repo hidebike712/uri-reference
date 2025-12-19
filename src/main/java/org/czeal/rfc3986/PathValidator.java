@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Hideki Ikeda
+ * Copyright (C) 2024-2025 Hideki Ikeda
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,166 +127,184 @@ class PathValidator
         //   path-empty    = 0<pchar>
         //
 
-        // If the authority is contained in the URI reference.
+        if (isValidPath(path, charset, relativeReference, hasAuthority))
+        {
+            return;
+        }
+
+        throw newIAE("The path value is invalid.");
+    }
+
+
+    private boolean isValidPath(String path, Charset charset, boolean relativeReference, boolean hasAuthority)
+    {
         if (hasAuthority)
         {
-            validatePathAbempty(path, charset);
-            return;
+            // When the URI reference has an authority, "path-abempty"
+            // is only allowed.
+            return isPathAbempty(path, charset);
         }
 
-        // Validate the value as a "path-abempty".
-        try
-        {
-            validatePathEmpty(path);
-            return;
-        }
-        catch (Throwable t)
-        {
-        }
+        // When the URI reference does not have an authority, one of
+        // the following types is allowed:
+        //
+        //   - "path-empty"
+        //   - "path-absolute"
+        //   - "path-noscheme" (when relativeReference is true)
+        //   - "path-rootless" (when relativeReference is false)
 
-        // Validate the value as a "path-absolute".
-        try
-        {
-            validatePathAbsolute(path, charset);
-            return;
-        }
-        catch (Throwable t)
-        {
-        }
-
-        // If the URI reference is a relative reference, validate the value as a
-        // "path-rootless"; otherwise, validate the value as a "path-noscheme".
-        if (relativeReference)
-        {
-            validatePathNoscheme(path, charset);
-        }
-        else
-        {
-            validatePathRootless(path, charset);
-        }
+        return relativeReference ?
+            (isPathEmpty(path) || isPathAbsolute(path, charset) || isPathNoscheme(path, charset)) :
+            (isPathEmpty(path) || isPathAbsolute(path, charset) || isPathRootless(path, charset));
     }
 
 
-    private void validatePathAbempty(String path, Charset charset)
+    private boolean isPathAbempty(String path, Charset charset)
     {
-        if (path == null || path.isEmpty())
+        if (isPathEmpty(path))
         {
-            // null or an empty value is allowed.
-            return;
+            // null or an empty string is allowed. Then, the path value
+            // is a "path-abempty".
+            return true;
         }
 
-        // Ensure the path starts with a slash.
-        ensurePathStartsWithSlash(path);
+        if (!path.startsWith("/"))
+        {
+            // The path value does not start with a slash. Then, the path
+            // value is not a "path-abempty".
+            return false;
+        }
 
         if (path.length() == 1)
         {
-            // The path only contains the first slash.
-            return;
+            // The path only contains the first slash. Then, the path
+            // value is a "path-abempty".
+            return true;
         }
 
-        // The path segments.
-        String[] segments = path.substring(1).split("/", -1);
-
-        // Validate each segment.
-        for (int i = 0; i < segments.length; i++)
+        try
         {
-            new SegmentValidator().validate(segments[i], charset);
+            // The path segments.
+            String[] segments = path.substring(1).split("/", -1);
+
+            // Validate each segment.
+            for (int i = 0; i < segments.length; i++)
+            {
+                new SegmentValidator().validate(segments[i], charset);
+            }
         }
+        catch (Throwable t)
+        {
+            // A segment in the path is invalid. Then, the path value
+            // is not a "path-absolute".
+            return false;
+        }
+
+        // The path value is a "path-abempty".
+        return true;
     }
 
 
-    private void validatePathAbsolute(String path, Charset charset)
+    private boolean isPathEmpty(String path)
     {
-        // Ensure the path is not empty.
-        ensurePathNotEmpty(path);
-
-        // Ensure the path starts with a slash.
-        ensurePathStartsWithSlash(path);
-
-        if (path.length() == 1)
-        {
-            // The path only contains the first slash.
-            return;
-        }
-
-        // Split the path into segments.
-        String[] segments = path.substring(1).split("/", -1);
-
-        // Validate the first element.
-        new SegmentNzValidator().validate(segments[0], charset);
-
-        // Validate remaining segments.
-        for (int i = 1; i < segments.length; i++)
-        {
-            new SegmentValidator().validate(segments[i], charset);
-        }
+        return path == null || path.isEmpty();
     }
 
 
-    private void validatePathNoscheme(String path, Charset charset)
-    {
-        // Ensure the path is not empty.
-        ensurePathNotEmpty(path);
-
-        // Split the path into segments.
-        String[] segments = path.split("/", -1);
-
-        // Validate the first element.
-        new SegmentNzNcValidator().validate(segments[0], charset);
-
-        // Validate the remaining segments.
-        for (int i = 1; i < segments.length; i++)
-        {
-            new SegmentValidator().validate(segments[i], charset);
-        }
-    }
-
-
-    private void validatePathRootless(String path, Charset charset)
-    {
-        // Ensure the path is not empty.
-        ensurePathNotEmpty(path);
-
-        // Split the path into segments.
-        String[] segments = path.split("/", -1);
-
-        // Validate the first element.
-        new SegmentNzValidator().validate(segments[0], charset);
-
-        // Validate the remaining segments.
-        for (int i = 1; i < segments.length; i++)
-        {
-            new SegmentValidator().validate(segments[i], charset);
-        }
-    }
-
-
-    private void validatePathEmpty(String path)
-    {
-        if (!path.isEmpty())
-        {
-            // The path must not be empty.
-            throw newIAE("The path must be empty");
-        }
-    }
-
-
-    private void ensurePathNotEmpty(String path)
-    {
-        if (path == null || path.isEmpty())
-        {
-            // The path must not be empty.
-            throw newIAE("The path must not be empty.");
-        }
-    }
-
-
-    private void ensurePathStartsWithSlash(String path)
+    private boolean isPathAbsolute(String path, Charset charset)
     {
         if (!path.startsWith("/"))
         {
-            // The path-abempty must start with a slash.
-            throw newIAE("The path must start with a slash.");
+            // The path value does not start with a slash. Then, the path
+            // value is not a "path-absolute".
+            return false;
         }
+
+        if (path.length() == 1)
+        {
+            // The path value only contains the first slash. Then, the
+            // path value is a "path-absolute".
+            return true;
+        }
+
+        // Split the path into segments.
+        String[] segments = path.substring(1).split("/", -1);
+
+        try
+        {
+            // Validate the first element.
+            new SegmentNzValidator().validate(segments[0], charset);
+
+            // Validate remaining segments.
+            for (int i = 1; i < segments.length; i++)
+            {
+                new SegmentValidator().validate(segments[i], charset);
+            }
+        }
+        catch (Throwable t)
+        {
+            // A segment in the path is invalid. Then, the path value
+            // is not a "path-absolute".
+            return false;
+        }
+
+        // The path value is a "path-absolute".
+        return true;
+    }
+
+
+    private boolean isPathNoscheme(String path, Charset charset)
+    {
+        // Split the path into segments.
+        String[] segments = path.split("/", -1);
+
+        try
+        {
+            // Validate the first element.
+            new SegmentNzNcValidator().validate(segments[0], charset);
+
+            // Validate the remaining segments.
+            for (int i = 1; i < segments.length; i++)
+            {
+                new SegmentValidator().validate(segments[i], charset);
+            }
+        }
+        catch (Throwable t)
+        {
+            // A segment in the path is invalid. Then, the path value
+            // is not a "path-noscheme".
+            return false;
+        }
+
+        // The path value is a "path-noscheme".
+        return true;
+    }
+
+
+    private boolean isPathRootless(String path, Charset charset)
+    {
+        // Split the path into segments.
+        String[] segments = path.split("/", -1);
+
+        try
+        {
+            // Validate the first element.
+            new SegmentNzValidator().validate(segments[0], charset);
+
+            // Validate the remaining segments.
+            for (int i = 1; i < segments.length; i++)
+            {
+                new SegmentValidator().validate(segments[i], charset);
+            }
+        }
+        catch (Throwable t)
+        {
+            // A segment in the path is invalid. Then, the path value
+            // is not a "path-rootless".
+            return false;
+        }
+
+        // The path value is a "path-rootless".
+        return true;
     }
 }

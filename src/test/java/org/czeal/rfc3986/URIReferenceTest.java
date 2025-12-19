@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Hideki Ikeda
+ * Copyright (C) 2024-2025 Hideki Ikeda
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 package org.czeal.rfc3986;
 
 
+import static org.czeal.rfc3986.HostType.IPV4;
+import static org.czeal.rfc3986.HostType.IPV6;
+import static org.czeal.rfc3986.HostType.IPVFUTURE;
+import static org.czeal.rfc3986.HostType.REGNAME;
 import static org.czeal.rfc3986.TestUtils.assertThrowsIAE;
 import static org.czeal.rfc3986.TestUtils.assertThrowsISE;
 import static org.czeal.rfc3986.TestUtils.assertThrowsNPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.czeal.rfc3986.HostType.IPV4;
-import static org.czeal.rfc3986.HostType.IPV6;
-import static org.czeal.rfc3986.HostType.IPVFUTURE;
-import static org.czeal.rfc3986.HostType.REGNAME;
 import org.junit.jupiter.api.Test;
 
 
@@ -448,7 +448,7 @@ public class URIReferenceTest
         assertEquals(null, uriRef29.getFragment());
 
         assertThrowsIAE(
-            "The path segment value \"1invalid:\" has an invalid character \":\" at the index 8.",
+            "The path value is invalid.",
             () -> URIReference.parse("1invalid://example.com"));
 
         assertThrowsIAE(
