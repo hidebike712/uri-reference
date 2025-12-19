@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Hideki Ikeda
+ * Copyright (C) 2024-2025 Hideki Ikeda
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class PathValidatorTest
         new PathValidator().validate(null, UTF_8, true, true);
 
         assertThrowsIAE(
-            "The path must start with a slash.",
+            "The path value is invalid.",
             () -> new PathValidator().validate("segment", UTF_8, true, true));
 
         //
@@ -50,14 +50,11 @@ public class PathValidatorTest
         new PathValidator().validate("/", UTF_8, true, false);
         new PathValidator().validate("segment", UTF_8, true, false);
         new PathValidator().validate("", UTF_8, true, false);
+        new PathValidator().validate(null, UTF_8, true, false);
 
         assertThrowsIAE(
-            "The path segment value must not be empty.",
+            "The path value is invalid.",
             () -> new PathValidator().validate("//", UTF_8, true, false));
-
-        assertThrowsIAE(
-            "The path must not be empty.",
-            () -> new PathValidator().validate(null, UTF_8, true, false));
 
         //
         // relativeReference = false, hasAuthority = true
@@ -71,11 +68,11 @@ public class PathValidatorTest
         new PathValidator().validate(null, UTF_8, false, true);
 
         assertThrowsIAE(
-            "The path must start with a slash.",
+            "The path value is invalid.",
             () -> new PathValidator().validate("segment", UTF_8, false, true));
 
         //
-        // relativeReference = false, hasAuthority = true
+        // relativeReference = false, hasAuthority = false
         //
         new PathValidator().validate("/segment", UTF_8, false, false);
         new PathValidator().validate("/segment/", UTF_8, false, false);
@@ -83,13 +80,10 @@ public class PathValidatorTest
         new PathValidator().validate("/", UTF_8, false, false);
         new PathValidator().validate("segment", UTF_8, false, false);
         new PathValidator().validate("", UTF_8, false, false);
+        new PathValidator().validate(null, UTF_8, false, false);
 
         assertThrowsIAE(
-            "The path segment value must not be empty.",
+            "The path value is invalid.",
             () -> new PathValidator().validate("//", UTF_8, false, false));
-
-        assertThrowsIAE(
-            "The path must not be empty.",
-            () -> new PathValidator().validate(null, UTF_8, false, false));
     }
 }

@@ -444,7 +444,7 @@ public class URIReferenceParserTest
         assertEquals(null, uriRef29.getFragment());
 
         assertThrowsIAE(
-            "The path segment value \"1invalid:\" has an invalid character \":\" at the index 8.",
+            "The path value is invalid.",
             () -> new URIReferenceParser().parse("1invalid://example.com", UTF_8));
 
         assertThrowsIAE(
