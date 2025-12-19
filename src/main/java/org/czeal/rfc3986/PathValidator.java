@@ -163,8 +163,8 @@ class PathValidator
     {
         if (isPathEmpty(path))
         {
-            // null or an empty string is allowed. Then, the path value
-            // is a "path-abempty".
+            // The path value is null or an empty string. Then, the path
+            // value is a "path-abempty".
             return true;
         }
 
@@ -196,7 +196,7 @@ class PathValidator
         catch (Throwable t)
         {
             // A segment in the path is invalid. Then, the path value
-            // is not a "path-absolute".
+            // is not a "path-abempty".
             return false;
         }
 
@@ -213,6 +213,15 @@ class PathValidator
 
     private boolean isPathAbsolute(String path, Charset charset)
     {
+        // We don't call isPathEmpty() here because we assume it is called
+        // prior to this method.
+        // if (isPathEmpty(path))
+        // {
+        //     // The path value is null or an empty string. Then, the
+        //     // path value is not a "path-absolute".
+        //     return false;
+        // }
+
         if (!path.startsWith("/"))
         {
             // The path value does not start with a slash. Then, the path
@@ -255,6 +264,15 @@ class PathValidator
 
     private boolean isPathNoscheme(String path, Charset charset)
     {
+        // We don't call isPathEmpty() here because we assume it is called
+        // prior to this method.
+        // if (isPathEmpty(path))
+        // {
+        //     // The path value is null or an empty string. Then, the
+        //     // path value is not a "path-noscheme".
+        //     return false;
+        // }
+
         // Split the path into segments.
         String[] segments = path.split("/", -1);
 
@@ -283,6 +301,15 @@ class PathValidator
 
     private boolean isPathRootless(String path, Charset charset)
     {
+        // We don't call isPathEmpty() here because we assume it is called
+        // prior to this method.
+        // if (isPathEmpty(path))
+        // {
+        //     // The path value is null or an empty string. Then, the
+        //     // path value is not a "path-rootless".
+        //     return false;
+        // }
+
         // Split the path into segments.
         String[] segments = path.split("/", -1);
 
