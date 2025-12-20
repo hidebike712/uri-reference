@@ -2,14 +2,14 @@
 
 ## Overview
 
-This library is designed in accordance with [RFC 3986](https://datatracker.ietf.org/doc/rfc3986/), the latest authoritative 
-specification for URIs. It offers advanced URI management capabilities beyond those found in Java's standard `java.net.URI` 
-class, which still conforms to the outdated [RFC 2396](https://datatracker.ietf.org/doc/rfc2396). Below are some of the 
+This library is designed in accordance with [RFC 3986](https://datatracker.ietf.org/doc/rfc3986/), the latest authoritative
+specification for URIs. It offers advanced URI management capabilities beyond those found in Java's standard `java.net.URI`
+class, which still conforms to the outdated [RFC 2396](https://datatracker.ietf.org/doc/rfc2396). Below are some of the
 challenges you may encounter with `java.net.URI`:
 
 #### :red_circle: Host containing underscores (`_`)
 
-RFC 3986 permits underscores (`_`) in the host part of URI references; however, RFC 2396 does not allow them. `java.net.URI` 
+RFC 3986 permits underscores (`_`) in the host part of URI references; however, RFC 2396 does not allow them. `java.net.URI`
 class does not recognize these as valid, resulting in unexpected behaviors:
 
 ```java
@@ -47,12 +47,12 @@ Using this library ensures compliance with modern URI standards and avoids these
 
 The library offers four key functionalities for robust URI management:
 
-- [Parsing](#white_check_mark-parsing)
-- [Resolving](#white_check_mark-resolving)
-- [Normalizing](#white_check_mark-normalizing)
-- [Constructing](#white_check_mark-construction)
+- [Parsing](#parsing)
+- [Resolving](#resolving)
+- [Normalizing](#normalizing)
+- [Constructing](#constructing)
 
-Each feature is designed to handle URIs accurately and effectively, ensuring reliable and precise management across various 
+Each feature is designed to handle URIs accurately and effectively, ensuring reliable and precise management across various
 application contexts.
 
 ## Installation
@@ -75,6 +75,7 @@ https://hidebike712.github.io/rfc3986/
 
 ## Usage
 
+<a id="parsing"></a>
 ### :white_check_mark: Parsing
 
 To parse URI references, use `URIReference.parse(String uriRef)` or `URIReference.parse(String uriRef, Charset charset)`. Below are some examples of using `URIReference.parse(String uriRef)`.
@@ -131,7 +132,7 @@ System.out.println(uriRef.getUserinfo());             // null
 System.out.println(uriRef.getHost().getType());       // "IPV4"
 System.out.println(uriRef.getHost().getValue());      // "101.102.103.104"
 System.out.println(uriRef.getPort());                 // -1
-System.out.println(uriRef.getPath());                 // null
+System.out.println(uriRef.getPath());                 // ""
 System.out.println(uriRef.getQuery());                // null
 System.out.println(uriRef.getFragment());             // null
 ```
@@ -150,7 +151,7 @@ System.out.println(uriRef.getUserinfo());             // null
 System.out.println(uriRef.getHost().getType());       // "IPV6"
 System.out.println(uriRef.getHost().getValue());      // "[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]"
 System.out.println(uriRef.getPort());                 // -1
-System.out.println(uriRef.getPath());                 // null
+System.out.println(uriRef.getPath());                 // ""
 System.out.println(uriRef.getQuery());                // null
 System.out.println(uriRef.getFragment());             // null
 ```
@@ -169,7 +170,7 @@ System.out.println(uriRef.getUserinfo());             // null
 System.out.println(uriRef.getHost().getType());       // "IPVFUTURE"
 System.out.println(uriRef.getHost().getValue());      // "[v9.abc:def]"
 System.out.println(uriRef.getPort());                 // -1
-System.out.println(uriRef.getPath());                 // null
+System.out.println(uriRef.getPath());                 // ""
 System.out.println(uriRef.getQuery());                // null
 System.out.println(uriRef.getFragment());             // null
 ```
@@ -188,16 +189,17 @@ System.out.println(uriRef.getUserinfo());             // null
 System.out.println(uriRef.getHost().getType());       // "REGNAME"
 System.out.println(uriRef.getHost().getValue());      // "%65%78%61%6D%70%6C%65.com"
 System.out.println(uriRef.getPort());                 // -1
-System.out.println(uriRef.getPath());                 // null
+System.out.println(uriRef.getPath());                 // ""
 System.out.println(uriRef.getQuery());                // null
 System.out.println(uriRef.getFragment());             // null
 ```
 
 > [!WARNING]
-> If parsing fails, those methods throws `NullPointerException` or `IllegalArgumentException`. See [Java doc]() for more details.
+> If parsing fails, those methods throws `NullPointerException` or `IllegalArgumentException`. See [Java doc](https://hidebike712.github.io/rfc3986/) for more details.
 
 ---
 
+<a id="resolving"></a>
 ### :white_check_mark: Resolving
 
 To resolve a relative reference against a URI reference, use `resolve(String uriRef)` or `resolve(URIReference uriRef)`. Below is an example demonstrating how to resolve a relative reference against a base URI.
@@ -228,6 +230,7 @@ System.out.println(resolved.getFragment());             // null
 
 ---
 
+<a id="normalizing"></a>
 ### :white_check_mark: Normalizing
 
 For normalization, invoke `normalize()` on a `URIReference` instance to normalize.
@@ -326,6 +329,7 @@ System.out.println(normalized.getFragment());             // null
 > > A URI reference must be transformed to its target URI before
 > > it can be normalized.---
 
+<a id="constructing"></a>
 ### :white_check_mark: Constructing
 
 To construct URI references, use `URIReferenceBuilder` class.
@@ -334,10 +338,10 @@ To construct URI references, use `URIReferenceBuilder` class.
 
 ```java
 URIReference uriRef = new URIReferenceBuilder()
-                          .setScheme("http") 
+                          .setScheme("http")
                           .setHost("example.com")
                           .setPath("/a/b/c")
-                          .query("k1", "v1")
+                          .appendQueryParam("k1", "v1")
                           .build();
 
 System.out.println(uriRef.toString());                // "http://example.com/a/b/c?k1=v1"
@@ -396,5 +400,5 @@ URIReference resolved = URIReference.parse("http://example.com").resolve("/a/b")
 
 ## See Also
 
-- [RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax](https://datatracker.ietf.org/doc/html/rfc3986)
+- [RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax](https://datatracker.ietf.org/doc/rfc3986)
 - [RFC 2396 - Uniform Resource Identifiers (URI): Generic Syntax](https://datatracker.ietf.org/doc/rfc2396)
