@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Hideki Ikeda
+ * Copyright (C) 2024-2025 Hideki Ikeda
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ import org.czeal.rfc3986.URIReference.ProcessResult;
  *                           .setScheme("http")
  *                           .setHost("example.com")
  *                           .setPath("/a/b/c")
- *                           .query("k1", "v1")
+ *                           .appendQueryParam("k1", "v1")
  *                           .build();
  *
  * System.out.println(uriRef.toString());                          // "http://example.com/a/b/c?k1=v1"
