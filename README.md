@@ -60,7 +60,7 @@ application contexts.
 ```xml
 <dependency>
     <groupId>org.czeal</groupId>
-    <artifactId>rfc3986</artifactId>
+    <artifactId>uri-reference</artifactId>
     <version>{version}</version>
 </dependency>
 ```
@@ -71,7 +71,7 @@ Apache License, Version 2.0
 
 ## Java Doc
 
-https://hidebike712.github.io/rfc3986/
+https://hidebike712.github.io/uri-reference/
 
 ## Usage
 
@@ -195,7 +195,7 @@ System.out.println(uriRef.getFragment());             // null
 ```
 
 > [!WARNING]
-> If parsing fails, those methods throws `NullPointerException` or `IllegalArgumentException`. See [Java doc](https://hidebike712.github.io/rfc3986/) for more details.
+> If parsing fails, those methods throws `NullPointerException` or `IllegalArgumentException`. See [Java doc](https://hidebike712.github.io/uri-reference/) for more details.
 
 ---
 
