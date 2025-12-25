@@ -5,7 +5,7 @@
 
     <groupId>org.czeal</groupId>
     <artifactId>urireference</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
 
     <name>Java URI Library Compliant with RFC 3986</name>
